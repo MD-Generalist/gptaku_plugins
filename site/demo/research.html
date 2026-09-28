@@ -1,0 +1,70 @@
+<!doctype html><html><head><meta charset="utf-8"><title>insane-research demo</title>
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+body{width:1280px;height:720px;overflow:hidden}
+.stage{position:absolute;inset:0;padding:34px 40px;display:flex;flex-direction:column;gap:16px}
+.top{display:flex;align-items:center;gap:14px}.top img{width:34px}.top b{font-size:20px}.top .q{margin-left:auto;font:15px var(--mono);color:var(--mute)}
+.main{flex:1;display:grid;grid-template-columns:290px 1fr 340px;gap:16px;min-height:0}
+.col{background:#101017;border:1px solid var(--line);border-radius:14px;padding:16px;overflow:hidden;position:relative}
+.col h5{margin:0 0 12px;font:600 13px var(--mono);color:var(--mute);display:flex}.col h5 span{margin-left:auto;color:var(--text)}
+.agent{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13.5px}
+.agent .dot{width:9px;height:9px;border-radius:50%;background:#333;flex:none}.agent .dot.on{background:var(--coral);box-shadow:0 0 10px var(--coral)}.agent .dot.done{background:var(--ok)}
+.agent .n{margin-left:auto;font:12px var(--mono);color:var(--mute)}
+.agent .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.src{display:flex;gap:8px;align-items:center;font:12.5px var(--mono);margin-bottom:5px;white-space:nowrap}
+.gr{flex:none;font-weight:700;width:22px;text-align:center;border-radius:4px;font-size:11px;padding:1px 0}
+.grA{background:#173d24;color:#56d364}.grB{background:#3d3417;color:#e3b341}.grC{background:#3d1f17;color:#f0883e}
+.src .d{flex:none;color:var(--mute);width:170px;overflow:hidden;text-overflow:ellipsis}.src .tt{overflow:hidden;text-overflow:ellipsis}
+.bucket{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.bucket b{font-size:34px;display:block;line-height:1.1}.bucket small{color:var(--mute);font-size:12.5px}
+.ok b{color:var(--ok)}.un b{color:var(--warn)}.rf b{color:var(--bad)}
+.claim{font-size:12px;color:var(--mute);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.seal{position:absolute;left:16px;right:16px;bottom:16px;border:1px dashed #3a5f3f;border-radius:10px;padding:10px 12px;font:12px var(--mono);color:#7ee787;opacity:0}
+.caption{height:44px;line-height:44px;text-align:center;font:600 22px "Pretendard Variable",Pretendard,sans-serif}
+</style></head><body>
+<div class="stage">
+ <div class="top"><img src="../assets/logo.svg" alt=""><b>insane-research</b><span class="q" id="q"></span></div>
+ <div class="main">
+  <div class="col"><h5><em id="h0" style="font-style:normal"></em> <span id="ac"></span></h5><div id="agents"></div></div>
+  <div class="col"><h5><em id="h1" style="font-style:normal"></em> <span id="sc"></span></h5><div id="srcs"></div></div>
+  <div class="col"><h5><em id="h2" style="font-style:normal"></em> <span>validate_ledger.py</span></h5>
+   <div class="bucket ok"><b id="v">0</b><small id="b0"></small><div id="vc"></div></div>
+   <div class="bucket un"><b id="u">0</b><small id="b1"></small><div id="uc"></div></div>
+   <div class="bucket rf"><b id="r">0</b><small id="b2"></small></div>
+   <div class="seal" id="seal">PASS · leak_rate 0.0<br>signature 588417d1…</div>
+  </div>
+ </div>
+ <div class="caption" id="cap"></div>
+</div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||'en';
+const TX={ko:{q:'/insane-research Claude Code 멀티세션 앱 번들 ID + Windows 알림 구현',h:['병렬 에이전트','수집 소스 · A–E 등급','검증 게이트'],b:['검증 — 독립 출처 2개 이상, 본문에 단정','미확정 — 본문에서 빼고 부록으로','반박'],unit:'건',claims:true,
+ ax:['CC 멀티세션 매니저 전수 조사','macOS 터미널/IDE 번들 ID 검증','Windows 토스트 알림 구현','Windows 부모 터미널 식별','확장: 매니저 앱 추가 발굴','확장: Electron appId 확인','확장: superset 배포 형태','확장: parallel-code·Tempest'],
+ c1:'질문 하나에 <span class="g">에이전트 8개</span>가 동시에 출발',c2:'모든 출처에 <span class="g">A–E 신뢰 등급</span>',c3:'출처 두 곳으로 확인 안 된 주장은 <span class="g">본문에 못 들어간다</span>'},
+en:{q:'/insane-research Claude Code multi-session app bundle IDs + Windows notifications',h:['Parallel agents','Sources · A–E grades','Verification gate'],b:['Verified — 2+ independent sources, stated in body','Unresolved — moved out of the body into an annex','Refuted'],unit:'',claims:false,
+ ax:['Survey of CC multi-session managers','Verify macOS terminal/IDE bundle IDs','Windows toast notifications','Identify parent terminal on Windows','Expand: more manager apps','Expand: Electron appIds','Expand: superset distribution','Expand: parallel-code · Tempest'],
+ c1:'One question, <span class="g">eight agents</span> at once',c2:'Every source gets an <span class="g">A–E trust grade</span>',c3:'Claims without two sources <span class="g">never reach the body</span>'},
+zh:{q:'/insane-research Claude Code 多会话应用 Bundle ID + Windows 通知实现',h:['并行智能体','来源 · A–E 评级','核验关卡'],b:['已核验 — 2 个以上独立来源，写入正文','未确定 — 移出正文，放入附录','已驳斥'],unit:' 条',claims:false,
+ ax:['CC 多会话管理器全面调查','核验 macOS 终端/IDE Bundle ID','Windows 通知实现','Windows 父终端识别','扩展：更多管理器应用','扩展：Electron appId','扩展：superset 分发形式','扩展：parallel-code · Tempest'],
+ c1:'一个问题，<span class="g">八个智能体</span>同时出发',c2:'每个来源都有 <span class="g">A–E 可信度评级</span>',c3:'没有两个来源证实的论断<span class="g">进不了正文</span>'}}[LANG];
+const AX0=['CC 멀티세션 매니저 전수 조사','macOS 터미널/IDE 번들 ID 검증','Windows 토스트 알림 구현','Windows 부모 터미널 식별','확장: 매니저 앱 추가 발굴','확장: Electron appId 확인','확장: superset 배포 형태','확장: parallel-code·Tempest'];
+let D;const $=id=>document.getElementById(id);
+fetch('research.json').then(r=>r.json()).then(d=>{D=d;$('q').textContent=TX.q;TX.h.forEach((x,i)=>$('h'+i).textContent=x);TX.b.forEach((x,i)=>$('b'+i).textContent=x);window.__ready=true;seek(0)});
+const cl=(a,b,t)=>Math.min(1,Math.max(0,(t-a)/(b-a)));
+window.seek=function(t){
+  const sp=cl(0.6,3.2,t); // agents spawn
+  const sp2=cl(1.2,7.0,t); // sources
+  const na=Math.ceil(sp*8), ns=Math.floor(sp2*D.sources.length);
+  $('agents').innerHTML=TX.ax.map((a,i)=>{const on=i<na, done=t>7.2||(i<na&&t>2.5+i*0.55);
+    return `<div class="agent" style="opacity:${on?1:.25}"><i class="dot ${done?'done':on?'on':''}"></i><span class="t">${a}</span><span class="n">${on?Math.round(D.agents[i]*Math.min(1,sp2*1.3)):''}</span></div>`}).join('');
+  $('ac').textContent=na?`${na}/8`:'';
+  $('sc').textContent=ns?`${ns}${TX.unit}`:'';
+  $('srcs').innerHTML=D.sources.slice(Math.max(0,ns-24),ns).map(s=>`<div class="src"><span class="gr gr${s.q}">${s.q}</span><span class="d">${s.d}</span><span class="tt">${s.t}</span></div>`).join('');
+  const vp=cl(6.2,9.2,t);const nv=Math.round(vp*D.verified.length),nu=Math.round(vp*D.unresolved.length);
+  $('v').textContent=nv;$('u').textContent=nu;
+  $('vc').innerHTML=!TX.claims?'':D.verified.slice(Math.max(0,nv-3),nv).map(c=>`<div class="claim">✓ ${c}</div>`).join('');
+  $('uc').innerHTML=!TX.claims?'':D.unresolved.slice(Math.max(0,nu-2),nu).map(c=>`<div class="claim">? ${c}</div>`).join('');
+  $('seal').style.opacity=cl(9.4,9.9,t);
+  $('cap').innerHTML=t<3.2?TX.c1:t<6.2?TX.c2:TX.c3;
+};
+</script></body></html>

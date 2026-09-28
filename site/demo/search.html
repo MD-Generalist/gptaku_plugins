@@ -1,0 +1,63 @@
+<!doctype html><html><head><meta charset="utf-8"><title>insane-search demo</title>
+<link rel="stylesheet" href="../assets/site.css">
+<style>
+body{width:1280px;height:720px;overflow:hidden;background:#0b0b10}
+.stage{position:absolute;inset:0;padding:34px 40px;display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:center;gap:14px}.top img{width:34px}.top b{font-size:20px}.top .q{margin-left:auto;font:15px var(--mono);color:var(--mute)}
+.panes{flex:1;display:grid;grid-template-columns:1fr 1.35fr;gap:18px;min-height:0}
+.pane{background:#101017;border:1px solid var(--line);border-radius:14px;display:flex;flex-direction:column;overflow:hidden}
+.bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line);font:13px var(--mono);color:var(--mute)}
+.bar i{width:11px;height:11px;border-radius:50%;background:#333}.bar span{margin-left:8px}
+.body{flex:1;padding:16px 18px;font:14px/1.55 var(--mono);overflow:hidden;position:relative}
+.prompt{color:#c9bdff}.dim{color:var(--mute)}.bad{color:var(--bad)}.ok{color:var(--ok)}.warn{color:var(--warn)}
+.big403{margin-top:36px;text-align:center;opacity:0;transition:opacity .2s}.big403 b{display:block;font:800 88px "Pretendard Variable",Pretendard,sans-serif;color:var(--bad);letter-spacing:-.03em}
+.log{position:absolute;left:18px;right:18px;bottom:16px;top:52px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end}
+.log div{white-space:nowrap;font-size:12.5px}
+.result{position:absolute;inset:0;background:#101017;padding:18px 20px;opacity:0}
+.result h4{margin:0 0 12px;font:700 16px "Pretendard Variable",Pretendard,sans-serif;color:var(--ok)}
+.result table{font-size:13.5px}.result td,.result th{padding:8px 10px}
+.counter{font:700 13px var(--mono);color:var(--warn)}
+.caption{height:44px;line-height:44px;text-align:center;font:600 22px "Pretendard Variable",Pretendard,sans-serif}
+</style></head><body>
+<div class="stage">
+  <div class="top"><img src="../assets/logo.svg" alt=""><b>insane-search</b><span class="q" id="q"></span></div>
+  <div class="panes">
+    <div class="pane"><div class="bar"><i></i><i></i><i></i><span id="wf"></span></div>
+      <div class="body" id="L"></div></div>
+    <div class="pane"><div class="bar"><i></i><i></i><i></i><span>insane-search engine</span><span class="counter" id="cnt" style="margin-left:auto"></span></div>
+      <div class="body"><div id="Rh"></div><div class="log" id="log"></div>
+        <div class="result" id="res"><h4 id="okh"></h4>
+          <table><thead><tr id="th"></tr></thead><tbody id="rows"></tbody></table>
+          <p class="dim" id="foot" style="margin-top:14px;font-size:12.5px"></p></div>
+      </div></div>
+  </div>
+  <div class="caption" id="cap"></div>
+</div>
+<script>
+const LANG=new URLSearchParams(location.search).get('lang')||'en';
+const TX={ko:{kq:'키보드',q:'"쿠팡에서 키보드 검색 결과 가져와줘"',wf:'기본 WebFetch',end:'여기서 끝',ok:'✓ 공개 검색 결과 회수 — 52번째 시도, 실제 Chrome 경로',th:['상품','가격','리뷰'],foot:'engine ok=True · profile=akamai_bot_manager · 원문 2.0MB → 마크다운 · 로그인·API 키 없음',cnt:'시도',c1:'같은 URL, 같은 요청',c2:'막히면 <span class="g">다음 경로</span>로 — TLS 지문 · 모바일 변환 · 실제 브라우저',c3:'공개 페이지라면, <span class="g">결국 읽어낸다</span>'},
+en:{kq:'%ED%82%A4%EB%B3%B4%EB%93%9C',cur:'₩',names:["OMIIYA wired 108-key full-size membrane keyboard, quiet, black, KB6", "Geomax quiet membrane 104-key wired keyboard", "ABKO quiet full-size membrane 108-key keyboard, black, MK108", "Logitech USB wired standard keyboard, K120"],q:'"Get Coupang search results for keyboards"',wf:'Built-in WebFetch',end:'dead end',ok:'✓ Public results recovered — attempt 52, real Chrome route',th:['Product','Price','Reviews'],foot:'engine ok=True · profile=akamai_bot_manager · 2.0MB raw → markdown · no login, no API key · names translated from the Korean page',cnt:'attempt',c1:'Same URL, same request',c2:'Blocked? <span class="g">Next route</span> — TLS fingerprint · mobile variant · real browser',c3:'If it\'s public, <span class="g">it gets read</span>'},
+zh:{kq:'%ED%82%A4%EB%B3%B4%EB%93%9C',cur:'₩',names:["OMIIYA 有线 108 键全尺寸薄膜键盘，静音，黑色，KB6", "Geomax 静音薄膜 104 键有线键盘", "ABKO 静音全尺寸薄膜 108 键键盘，黑色，MK108", "罗技 USB 有线标准键盘，K120"],q:'"帮我获取 Coupang 上键盘的搜索结果"',wf:'内置 WebFetch',end:'到此为止',ok:'✓ 已取回公开结果 — 第 52 次尝试，真实 Chrome 路径',th:['商品','价格','评价'],foot:'engine ok=True · profile=akamai_bot_manager · 原始 2.0MB → Markdown · 无需登录与 API 密钥 · 商品名译自韩文页面',cnt:'尝试',c1:'同一个 URL，同一个请求',c2:'被拦？换 <span class="g">下一条路</span> — TLS 指纹 · 移动版 · 真实浏览器',c3:'只要是公开页面，<span class="g">就能读到</span>'}}[LANG];
+let T,C;const ready=Promise.all([fetch('traces.json').then(r=>r.json()),fetch('coupang.json').then(r=>r.json())]).then(([t,c])=>{T=t.coupang.filter(x=>typeof x==='object');C=c;
+ document.getElementById('rows').innerHTML=C.filter((p,i,a)=>a.findIndex(q=>q.name===p.name)===i).slice(0,5).map((p,i)=>`<tr><td>${TX.names?TX.names[i]:p.name.replace(/, 제조.*$/,'')}</td><td>${TX.cur?TX.cur+p.price.replace('원',''):p.price}</td><td>${p.reviews}</td></tr>`).join('');});
+const $=id=>document.getElementById(id);
+function type(s,t,cps=40){return s.slice(0,Math.max(0,Math.floor(t*cps)))}
+window.seek=function(t){
+  // left pane: WebFetch
+  $('L').innerHTML=`<div class="prompt">› WebFetch(coupang.com/np/search?q=${TX.kq})</div>`+
+    (t>1.2?`<div class="bad">✗ The server returned HTTP 403 Forbidden.</div><div class="dim">The response body was not retrieved.</div>`:'')+
+    `<div class="big403" style="opacity:${t>1.4?1:0}"><b>403</b><span class="dim">${TX.end}</span></div>`;
+  // right pane
+  const cmd=`› python3 -m engine "coupang.com/np/search?q=${TX.kq}" --trace`;
+  $('Rh').innerHTML=`<div class="prompt">${type(cmd,Math.max(0,t-0.3),60)}</div>`;
+  const t0=1.6,t1=8.2,n=T.length;
+  const k=t<t0?0:Math.min(n,Math.floor((t-t0)/(t1-t0)*n));
+  $('log').innerHTML=T.slice(Math.max(0,k-16),k).map(x=>{
+    const c=x.verdict.includes('ok')&&x.phase==='fallback'?'ok':(x.verdict==='challenge'||x.status==='403'?'bad':'warn');
+    return `<div><span class="dim">[${x.phase.padEnd(8)}]</span> ${x.method.padEnd(22)} ${x.xform.padEnd(16)} ${x.imp.padEnd(14)} <span class="${c}">${x.status} ${x.verdict}</span></div>`}).join('');
+  $('cnt').textContent=k?`${TX.cnt} ${Math.min(k,52)}/52`:'';
+  const r=Math.min(1,Math.max(0,(t-8.6)/0.5));$('res').style.opacity=r;
+  $('cap').innerHTML=t<1.6?TX.c1:t<8.6?TX.c2:TX.c3;
+};
+ready.then(()=>{$('q').textContent=TX.q;$('wf').textContent=TX.wf;$('okh').textContent=TX.ok;$('th').innerHTML=TX.th.map(x=>`<th>${x}</th>`).join('');$('foot').textContent=TX.foot;window.__ready=true;seek(0)});
+</script></body></html>

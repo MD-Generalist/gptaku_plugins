@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""site/ 랜딩 3종(허브·insane-search·insane-research)을 ko/en/zh 문구 사전 하나로 생성한다.
+"""site/ 랜딩 3종(허브·insane-search·insane-research)을 en/ko/zh 정적 페이지 9개로 생성한다.
 
-문구는 전부 이 파일의 T 사전에만 있다. HTML은 ko 문구를 기본값으로 박고(noJS 대비),
-site.js가 data-i 키로 언어를 바꿔 끼운다. 수치는 2026-09-28 실측값이다 — 손으로 바꾸지 말 것.
+문구는 전부 이 파일의 사전(COMMON·PLUGINS·HUB·SEARCH·RESEARCH)에만 있다. 언어마다 URL을 따로 두고
+hreflang·canonical·JSON-LD·sitemap을 함께 만든다. 수치는 2026-09-28 실측값이고 원본 기록은
+docs/landing/runs/2026-09-28/에 있다 — 기록 없이 손으로 바꾸지 말 것.
 """
 import html
 import json
 import pathlib
+import re
 
 SITE = pathlib.Path(__file__).resolve().parents[2] / "site"
 REPO = "https://github.com/fivetaku/gptaku_plugins"
@@ -15,13 +17,13 @@ MKT = "/plugin marketplace add https://github.com/fivetaku/gptaku_plugins.git"
 # ---------------------------------------------------------------- 공통 문구
 COMMON = {
     "ko": {"nav_plugins": "플러그인", "tab_me": "직접 설치", "tab_ai": "Claude에게 맡기기", "copy": "복사",
-           "_copied": "복사됨", "foot": "MIT 라이선스 · 비공식 커뮤니티 플러그인 (Anthropic과 무관)",
+           "_copied": "복사됨", "foot": "MIT 라이선스 · 만든 사람 <a href=\"https://github.com/fivetaku\">fivetaku</a> · 비공식 커뮤니티 플러그인 (Anthropic과 무관)",
            "bar_n": "{n}개 담음", "bar_copy": "설치 명령 복사", "bar_clear": "비우기"},
     "en": {"nav_plugins": "Plugins", "tab_me": "Install yourself", "tab_ai": "Ask Claude", "copy": "Copy",
-           "_copied": "Copied", "foot": "MIT License · Unofficial community plugins (not affiliated with Anthropic)",
+           "_copied": "Copied", "foot": "MIT License · Made by <a href=\"https://github.com/fivetaku\">fivetaku</a> · Unofficial community plugins (not affiliated with Anthropic)",
            "bar_n": "{n} selected", "bar_copy": "Copy install commands", "bar_clear": "Clear"},
     "zh": {"nav_plugins": "插件", "tab_me": "自己安装", "tab_ai": "交给 Claude", "copy": "复制",
-           "_copied": "已复制", "foot": "MIT 许可 · 非官方社区插件（与 Anthropic 无关）",
+           "_copied": "已复制", "foot": "MIT 许可 · 作者 <a href=\"https://github.com/fivetaku\">fivetaku</a> · 非官方社区插件（与 Anthropic 无关）",
            "bar_n": "已选 {n} 个", "bar_copy": "复制安装命令", "bar_clear": "清空"},
 }
 
@@ -60,19 +62,19 @@ PLUGINS = [
 
 # ---------------------------------------------------------------- 페이지별 문구
 HUB = {
-    "ko": {"_title": "gptaku plugins — Claude Code 플러그인 18종",
+    "ko": {"_title": "gptaku plugins — Claude Code 오픈소스 플러그인 18종",
            "h1": "Claude Code에 없던<br><span class=\"g\">도구 18개</span>",
            "lead": "Claude Code에 설치해 쓰는 플러그인 모음입니다. 막힌 웹페이지 읽기, 출처를 검증하는 리서치, 에이전트 팀 구성, API 키 관리처럼 기본 기능만으로는 번거로운 일을 슬래시 명령 하나로 처리합니다.",
            "feat_t": "먼저, 이 둘부터", "s_t": "Claude Code의 기본 fetch는 403, WAF, CAPTCHA를 만나면 거기서 포기합니다. insane-search는 공개 API와 피드부터 브라우저 TLS 지문, 실제 Chrome까지 단계를 올려 가며 공개된 본문을 가져오고, API 키는 필요 없습니다.", "r_t": "AI에게 리서치를 맡기면 출처가 불분명한 주장이 섞이기 쉽습니다. insane-research는 에이전트 여럿이 웹·학술·기술 자료를 동시에 조사하고, 핵심 주장은 2개 이상의 출처로 교차 검증해 A~E 등급이 붙은 인용 리포트로 전달합니다.",
            "see": "살펴보기 →", "all_t": "전체 플러그인", "all_s": "체크해 두면 설치 명령을 한 번에 복사할 수 있습니다.",
            "pick": "담기", "close_t": "마켓 한 번 등록하면,<br>나머지는 골라서."},
-    "en": {"_title": "gptaku plugins — 18 plugins for Claude Code",
+    "en": {"_title": "gptaku plugins — 18 open-source plugins for Claude Code",
            "h1": "The <span class=\"g\">18 tools</span><br>Claude Code was missing",
            "lead": "A set of plugins you install into Claude Code. Reading blocked web pages, research with checked sources, building agent teams, managing API keys: jobs that are tedious with the built-in tools become a single slash command.",
            "feat_t": "Start with these two", "s_t": "Claude Code's default fetch gives up when a site answers with a 403, a WAF wall or a CAPTCHA. insane-search escalates from public APIs and feeds to browser TLS fingerprints and a real Chrome until one route returns the public content, with no API key needed.", "r_t": "AI research answers can easily mix in claims with no clear source. insane-research sends several agents across web, academic and technical sources in parallel, cross-checks key claims against at least two sources, and delivers a cited report with A–E source ratings.",
            "see": "Take a look →", "all_t": "All plugins", "all_s": "Check the ones you want and copy every install command at once.",
            "pick": "Add", "close_t": "Add the marketplace once.<br>Pick the rest."},
-    "zh": {"_title": "gptaku plugins — 18 款 Claude Code 插件",
+    "zh": {"_title": "gptaku plugins — 18 款开源 Claude Code 插件",
            "h1": "Claude Code 缺的<br><span class=\"g\">18 件工具</span>",
            "lead": "一套安装到 Claude Code 里使用的插件。读取被拦截的网页、带来源核验的研究、组建智能体团队、管理 API 密钥——这些用内置功能很麻烦的事，一条斜杠命令就能完成。",
            "feat_t": "先从这两个开始", "s_t": "Claude Code 默认的抓取遇到 403、WAF 或 CAPTCHA 就会放弃。insane-search 从公开 API 和订阅源逐级升级到浏览器 TLS 指纹和真实 Chrome，直到取回公开内容，全程无需 API 密钥。", "r_t": "让 AI 做研究，结论里很容易混入来源不明的说法。insane-research 让多个智能体并行检索网络、学术与技术来源，关键论断至少经 2 个来源交叉验证，最终交付带 A–E 来源评级的引用报告。",
@@ -81,19 +83,20 @@ HUB = {
 }
 
 SEARCH = {
-    "ko": {"_title": "insane-search — 포기는 배추 셀 때나",
+    "ko": {"_title": "insane-search — 403·WAF에 막힌 페이지를 읽는 Claude Code 플러그인",
            "eyebrow": "Claude Code 플러그인 · API 키 필요 없음",
            "h1": "포기는<br><span class=\"acc\">배추 셀 때나.</span>",
            "lead": "WebFetch가 403·WAF·CAPTCHA에 막힌 공개 페이지를, 공개 API와 피드 → 브라우저 TLS 지문 → 실제 Chrome 순으로 경로를 바꿔 가며 읽어 옵니다. API 키는 필요 없고, 로그인이나 유료 벽 앞에서는 멈춘 뒤 그 사실을 알려 줍니다.",
-           "vs_t": "같은 URL, 다른 결과", "vs_s": "2026년 9월 28일, 쿠팡 \"키보드\" 검색 페이지.",
+           "vs_t": "같은 URL, 다른 결과", "vs_s": "2026년 9월 28일 첫 실행, 쿠팡 \"키보드\" 검색 페이지.",
            "vs_a": "기본 WebFetch", "vs_a_n": "요청이 거부되어 본문을 받지 못함",
            "vs_b": "insane-search", "vs_b_big": "상품 60개", "vs_b_n": "52번째 경로(실제 Chrome)에서 성공 · 41초",
            "play_t": "그 52번을 그대로 재생하면", "cap": "실제 실행 기록(trace)을 재생한 화면입니다.",
-           "facts_t": "오늘 돌려본 네 곳",
-           "f1": "쿠팡 검색", "f1v": "WebFetch 403 → 52번째 시도, 실제 Chrome", "f1t": "41초",
-           "f2": "레딧 인기글", "f2v": "curl 403 → 1번째 시도, 공식 RSS", "f2t": "1.7초",
-           "f3": "네이버 블로그", "f3v": "빈 프레임 → 2번째 시도, 모바일 주소", "f3t": "1초",
-           "f4": "X 프로필", "f4v": "로그인 벽 → 3번째 시도, 브라우저 TLS 지문", "f4t": "3초",
+           "facts_t": "같은 날 다시 돌려본 네 곳",
+           "facts_s": "두 번째 실행 기록입니다. 같은 사이트도 실행마다 통하는 경로가 달라서, 위 영상의 쿠팡(52번째 경로·41초)과 결과가 다릅니다. 원본 기록은 <a href=\"https://github.com/fivetaku/gptaku_plugins/tree/main/docs/landing/runs/2026-09-28\">GitHub</a>에 있습니다.",
+           "f1": "쿠팡 검색", "f1v": "WebFetch 403 → 18번째 시도, 모바일 주소 + Chrome TLS 지문", "f1t": "13.9초",
+           "f2": "레딧 인기글", "f2v": "1번째 시도, 레딧 공식 RSS", "f2t": "1.3초",
+           "f3": "네이버 블로그", "f3v": "프레임셋 껍데기 → 2번째 시도, 모바일 주소(m.)", "f3t": "0.9초",
+           "f4": "X 프로필", "f4v": "429 차단 2회 → 3번째 시도, Safari TLS 지문", "f4t": "2.5초",
            "how_t": "막히면, 다음 길로",
            "st1": "공식 경로부터", "st1d": "RSS, 공개 API처럼 사이트가 원래 열어 둔 길을 먼저 찾습니다.",
            "st2": "브라우저처럼 보이기", "st2d": "실제 브라우저의 TLS 지문과 쿠키, 모바일 주소를 조합해 다시 시도합니다.",
@@ -101,19 +104,20 @@ SEARCH = {
            "honest_t": "솔직하게",
            "honest": "수천 페이지를 정해진 시간마다 긁어야 한다면 호스팅 크롤러가 더 맞습니다. 로그인해야 보이는 페이지와 유료 기사는 뚫지 않고, 못 읽었다고 알려 줍니다. insane-search의 자리는 대화하다 막힌 공개 페이지 하나입니다.",
            "close_t": "막히는 순간,<br>알아서 끼어듭니다."},
-    "en": {"_title": "insane-search — 403 is not an answer",
+    "en": {"_title": "insane-search — Claude Code plugin that reads pages blocked by 403, WAF and CAPTCHA",
            "eyebrow": "Claude Code plugin · No API key",
            "h1": "403 is not<br><span class=\"acc\">an answer.</span>",
            "lead": "When WebFetch hits a 403, a WAF or a CAPTCHA on a public page, insane-search switches routes (public APIs and feeds, then browser TLS fingerprints, then a real Chrome) until the content comes back. No API key needed. At logins and paywalls it stops and tells you so.",
-           "vs_t": "Same URL, different outcome", "vs_s": "Coupang search for \"keyboard\", September 28, 2026.",
+           "vs_t": "Same URL, different outcome", "vs_s": "Coupang search for \"keyboard\", first run on September 28, 2026.",
            "vs_a": "Built-in WebFetch", "vs_a_n": "Request refused, no content",
            "vs_b": "insane-search", "vs_b_big": "60 products", "vs_b_n": "Succeeded on route 52 (real Chrome) · 41s",
            "play_t": "All 52 attempts, replayed", "cap": "A replay of the actual execution trace.",
-           "facts_t": "Four sites, run today",
-           "f1": "Coupang search", "f1v": "WebFetch 403 → attempt 52, real Chrome", "f1t": "41s",
-           "f2": "Reddit top posts", "f2v": "curl 403 → attempt 1, official RSS", "f2t": "1.7s",
-           "f3": "Naver Blog", "f3v": "Empty frame → attempt 2, mobile URL", "f3t": "1s",
-           "f4": "X profile", "f4v": "Login wall → attempt 3, browser TLS fingerprint", "f4t": "3s",
+           "facts_t": "Four sites, run again the same day",
+           "facts_s": "This is the second run. The route that works changes from run to run, so Coupang here differs from the video above (route 52, 41s). The raw logs are on <a href=\"https://github.com/fivetaku/gptaku_plugins/tree/main/docs/landing/runs/2026-09-28\">GitHub</a>.",
+           "f1": "Coupang search", "f1v": "WebFetch 403 → attempt 18, mobile URL + Chrome TLS fingerprint", "f1t": "13.9s",
+           "f2": "Reddit top posts", "f2v": "Attempt 1, Reddit's official RSS", "f2t": "1.3s",
+           "f3": "Naver Blog", "f3v": "Empty frameset → attempt 2, mobile URL (m.)", "f3t": "0.9s",
+           "f4": "X profile", "f4v": "429 twice → attempt 3, Safari TLS fingerprint", "f4t": "2.5s",
            "how_t": "Blocked? Next route.",
            "st1": "Official routes first", "st1d": "RSS feeds and public APIs the site already exposes.",
            "st2": "Look like a browser", "st2d": "Real browser TLS fingerprints, cookies and mobile URLs, in combination.",
@@ -121,19 +125,20 @@ SEARCH = {
            "honest_t": "To be fair",
            "honest": "If you need to crawl thousands of pages on a schedule, a hosted crawler is the better fit. insane-search won't break into login-only pages or paywalls; it tells you it couldn't read them. It's built for the one public page that stopped your conversation.",
            "close_t": "The moment you're blocked,<br>it steps in."},
-    "zh": {"_title": "insane-search — 403 不是终点",
+    "zh": {"_title": "insane-search — 读取被 403、WAF 拦截页面的 Claude Code 插件",
            "eyebrow": "Claude Code 插件 · 无需 API 密钥",
            "h1": "403<br><span class=\"acc\">不是终点。</span>",
            "lead": "WebFetch 在公开页面上遇到 403、WAF 或验证码时，insane-search 会依次换用公开 API 与订阅源、浏览器 TLS 指纹、真实 Chrome，直到取回内容。无需 API 密钥；遇到登录墙或付费墙则停下并如实告诉你。",
-           "vs_t": "同一个 URL，不同的结果", "vs_s": "2026 年 9 月 28 日，Coupang「键盘」搜索页。",
+           "vs_t": "同一个 URL，不同的结果", "vs_s": "2026 年 9 月 28 日第一次运行，Coupang「键盘」搜索页。",
            "vs_a": "内置 WebFetch", "vs_a_n": "请求被拒绝，没有拿到内容",
            "vs_b": "insane-search", "vs_b_big": "60 件商品", "vs_b_n": "第 52 条路径（真实 Chrome）成功 · 41 秒",
            "play_t": "把这 52 次原样回放", "cap": "回放的是真实执行记录（trace）。",
-           "facts_t": "今天实测的四个站点",
-           "f1": "Coupang 搜索", "f1v": "WebFetch 403 → 第 52 次，真实 Chrome", "f1t": "41 秒",
-           "f2": "Reddit 热帖", "f2v": "curl 403 → 第 1 次，官方 RSS", "f2t": "1.7 秒",
-           "f3": "Naver 博客", "f3v": "空框架 → 第 2 次，移动版地址", "f3t": "1 秒",
-           "f4": "X 个人主页", "f4v": "登录墙 → 第 3 次，浏览器 TLS 指纹", "f4t": "3 秒",
+           "facts_t": "同一天再跑一次的四个站点",
+           "facts_s": "这是第二次运行的记录。同一个站点每次能走通的路径都可能不同，所以这里的 Coupang 和上面视频（第 52 条路径、41 秒）不一样。原始记录在 <a href=\"https://github.com/fivetaku/gptaku_plugins/tree/main/docs/landing/runs/2026-09-28\">GitHub</a>。",
+           "f1": "Coupang 搜索", "f1v": "WebFetch 403 → 第 18 次，移动版地址 + Chrome TLS 指纹", "f1t": "13.9 秒",
+           "f2": "Reddit 热帖", "f2v": "第 1 次，Reddit 官方 RSS", "f2t": "1.3 秒",
+           "f3": "Naver 博客", "f3v": "空框架页 → 第 2 次，移动版地址（m.）", "f3t": "0.9 秒",
+           "f4": "X 个人主页", "f4v": "两次 429 → 第 3 次，Safari TLS 指纹", "f4t": "2.5 秒",
            "how_t": "被拦，就换路",
            "st1": "先走官方路径", "st1d": "先找网站本来就开放的 RSS 和公开 API。",
            "st2": "伪装成浏览器", "st2d": "组合真实浏览器的 TLS 指纹、Cookie 和移动版地址重新尝试。",
@@ -144,7 +149,7 @@ SEARCH = {
 }
 
 RESEARCH = {
-    "ko": {"_title": "insane-research — 그럴듯함은 근거가 아니다",
+    "ko": {"_title": "insane-research — 출처를 검증하는 Claude Code 딥리서치 플러그인",
            "eyebrow": "Claude Code 플러그인 · 멀티에이전트 딥리서치",
            "h1": "그럴듯함은<br><span class=\"acc\">근거가 아니다.</span>",
            "lead": "질문 하나를 주면 에이전트 여럿이 웹과 학술 자료를 동시에 조사해 인용이 달린 리포트로 정리합니다. 모든 출처에 A~E 등급을 매기고, 두 곳 이상에서 확인되지 않은 주장은 본문 대신 부록으로 보냅니다.",
@@ -159,7 +164,7 @@ RESEARCH = {
            "honest_t": "솔직하게",
            "honest": "개요만 빨리 필요하면 ChatGPT나 Gemini의 딥리서치가 더 편합니다. insane-research는 질문을 몇 개 되묻고 시간도 더 걸립니다. 기술 선택, 구현 근거, 숫자처럼 틀리면 손해가 큰 결정에 쓰세요.",
            "close_t": "틀리면 손해가 큰<br>결정 앞에서."},
-    "en": {"_title": "insane-research — Plausible isn't proof",
+    "en": {"_title": "insane-research — Claude Code plugin for cited, source-checked deep research",
            "eyebrow": "Claude Code plugin · Multi-agent deep research",
            "h1": "Plausible<br><span class=\"acc\">isn't proof.</span>",
            "lead": "Give it one question and several agents research web and academic sources in parallel, then write it up as a cited report. Every source gets an A–E grade, and any claim not confirmed by two or more sources goes to the appendix instead of the body.",
@@ -174,7 +179,7 @@ RESEARCH = {
            "honest_t": "To be fair",
            "honest": "If you just need a quick overview, ChatGPT or Gemini deep research is easier. insane-research asks a few scoping questions and takes longer. Use it for decisions where being wrong is expensive: technology choices, implementation evidence, numbers.",
            "close_t": "For decisions<br>you can't afford to get wrong."},
-    "zh": {"_title": "insane-research — 看起来像，不等于有据",
+    "zh": {"_title": "insane-research — 核验来源的 Claude Code 深度研究插件",
            "eyebrow": "Claude Code 插件 · 多智能体深度研究",
            "h1": "看起来像，<br><span class=\"acc\">不等于有据。</span>",
            "lead": "给它一个问题，多个智能体会并行检索网络与学术资料，整理成附带引用的报告。每个来源都有 A–E 评级，未经两个以上来源证实的论断不进正文，而是放进附录。",
@@ -192,123 +197,207 @@ RESEARCH = {
 }
 
 
-# ---------------------------------------------------------------- 조각
-def i(key, d, tag="span", cls="", extra=""):
-    c = f' class="{cls}"' if cls else ""
-    return f'<{tag}{c} data-i="{key}"{extra}>{d["en"][key]}</{tag}>'
+# ---------------------------------------------------------------- 출력 구조 (해외 SEO)
+# 언어마다 정적 페이지를 따로 만든다 — JS로 문구만 바꾸면 검색엔진은 기본 언어 한 벌만 본다.
+#   en: /            /insane-search/      /insane-research/   (x-default)
+#   ko: /ko/         /ko/insane-search/   /ko/insane-research/
+#   zh: /zh/         /zh/insane-search/   /zh/insane-research/
+# 모든 페이지가 서로를 hreflang으로 가리키고, canonical은 자기 자신이다.
+BASE = "https://fivetaku.github.io/gptaku_plugins/"
+LANGS = ("en", "ko", "zh")
+PREFIX = {"en": "", "ko": "ko/", "zh": "zh/"}
+HTML_LANG = {"en": "en", "ko": "ko", "zh": "zh-Hans"}
+OG_LOCALE = {"en": "en_US", "ko": "ko_KR", "zh": "zh_CN"}
+LANG_LABEL = {"en": "EN", "ko": "한국어", "zh": "中文"}
+PAGES = {"hub": "", "search": "insane-search/", "research": "insane-research/"}
+LOGO = (SITE / "assets" / "logo.svg").read_text().strip() if (SITE / "assets" / "logo.svg").exists() else ""
 
 
-def install(plugin, pre=""):
-    me = MKT + (f"\n/plugin install {plugin}@gptaku-plugins" if plugin else "")
-    return f'''<div class="install" role="group">
-  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="me" data-i="tab_me">{COMMON["en"]["tab_me"]}</button><button role="tab" aria-selected="false" data-tab="ai" data-i="tab_ai">{COMMON["en"]["tab_ai"]}</button></div>
-  <div class="cmd" data-tab="me"><pre>{html.escape(me)}</pre><button class="copy" data-copy="1" data-i="copy">{COMMON["en"]["copy"]}</button></div>
-  <div class="cmd prompt" data-tab="ai" hidden><pre data-i="{pre}ai">{html.escape(ai_prompt("en", plugin))}</pre><button class="copy" data-copy="1" data-i="copy">{COMMON["en"]["copy"]}</button></div>
-</div>'''
+def url(lang, page):
+    return BASE + PREFIX[lang] + PAGES[page]
 
 
-def head(d, root, accent, cls):
-    return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{d["en"]["_title"]}</title><meta name="description" content="{html.escape(d["en"].get("lead", d["en"].get("h1", "")).replace("<br>", " "))}">
-<meta property="og:title" content="{d["en"]["_title"]}"><meta property="og:image" content="{root}assets/art/{cls}.jpg">
+def rel_root(lang, page):
+    return "../" * (PREFIX[lang] + PAGES[page]).count("/")
+
+
+def plain(s):
+    return html.unescape(re.sub(r"<[^>]+>", " ", s)).replace("  ", " ").strip()
+
+
+def jsonld(lang, page, d):
+    author = {"@type": "Person", "name": "fivetaku", "url": "https://github.com/fivetaku"}
+    if page == "hub":
+        items = [{"@type": "ListItem", "position": n + 1,
+                  "item": {"@type": "SoftwareApplication", "name": name, "applicationCategory": "DeveloperApplication",
+                           "description": desc[["ko", "en", "zh"].index(lang)],
+                           "url": f"https://github.com/fivetaku/{name}"}}
+                 for n, (name, *desc) in enumerate(PLUGINS)]
+        data = {"@context": "https://schema.org", "@type": "CollectionPage", "name": d["_title"],
+                "description": plain(d["lead"]), "url": url(lang, page), "inLanguage": HTML_LANG[lang],
+                "author": author, "mainEntity": {"@type": "ItemList", "numberOfItems": len(PLUGINS), "itemListElement": items}}
+    else:
+        name = "insane-search" if page == "search" else "insane-research"
+        data = {"@context": "https://schema.org", "@type": "SoftwareApplication", "name": name,
+                "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Claude Code plugin",
+                "operatingSystem": "macOS, Linux, Windows", "description": plain(d["lead"]),
+                "url": url(lang, page), "inLanguage": HTML_LANG[lang], "license": "https://opensource.org/licenses/MIT",
+                "isAccessibleForFree": True, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+                "sameAs": [f"https://github.com/fivetaku/{name}"], "author": author,
+                "image": BASE + f"assets/art/{page}.jpg"}
+    return json.dumps(data, ensure_ascii=False).replace("</", "<\\/")
+
+
+def head(lang, page, d, accent):
+    root = rel_root(lang, page)
+    desc = html.escape(plain(d["lead"]))
+    title = html.escape(d["_title"])
+    alts = "".join(f'<link rel="alternate" hreflang="{HTML_LANG[l]}" href="{url(l, page)}">' for l in LANGS)
+    alts += f'<link rel="alternate" hreflang="x-default" href="{url("en", page)}">'
+    og_alt = "".join(f'<meta property="og:locale:alternate" content="{OG_LOCALE[l]}">' for l in LANGS if l != lang)
+    img = BASE + f"assets/art/{page}.jpg"
+    switch = "".join(
+        f'<a href="{root}{PREFIX[l]}{PAGES[page]}" hreflang="{HTML_LANG[l]}" lang="{HTML_LANG[l]}"'
+        f'{" aria-current=\"true\"" if l == lang else ""}>{LANG_LABEL[l]}</a>' for l in LANGS)
+    home = f"{root}{PREFIX[lang]}"
+    return f'''<!doctype html><html lang="{HTML_LANG[lang]}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{title}</title><meta name="description" content="{desc}">
+<link rel="canonical" href="{url(lang, page)}">{alts}
+<meta property="og:type" content="website"><meta property="og:site_name" content="gptaku plugins"><meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}"><meta property="og:url" content="{url(lang, page)}"><meta property="og:locale" content="{OG_LOCALE[lang]}">{og_alt}
+<meta property="og:image" content="{img}"><meta property="og:image:width" content="1600"><meta property="og:image:height" content="900">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{title}"><meta name="twitter:description" content="{desc}"><meta name="twitter:image" content="{img}">
 <link rel="icon" href="{root}assets/logo.svg"><link rel="stylesheet" href="{root}assets/site.css">
-<style>:root{{--accent:{accent}}}</style></head><body class="{cls}">
-<nav><div class="wrap"><a class="brand" href="{root}"><img src="{root}assets/logo.svg" alt="">gptaku plugins</a>
-<div class="links"><a href="{root}#plugins" data-i="nav_plugins">{COMMON["en"]["nav_plugins"]}</a><a href="{REPO}">GitHub</a>
-<div class="lang" role="group" aria-label="Language"><button data-l="en" aria-pressed="true">EN</button><button data-l="ko" aria-pressed="false">한국어</button><button data-l="zh" aria-pressed="false">中文</button></div></div></div></nav>
+<script type="application/ld+json">{jsonld(lang, page, d)}</script>
+<style>:root{{--accent:{accent}}}</style></head><body class="{page}">
+<nav><div class="wrap"><a class="brand" href="{home}"><span class="logo" aria-hidden="true">{LOGO}</span>gptaku plugins</a>
+<div class="links"><a href="{home}#plugins">{d["nav_plugins"]}</a><a href="{REPO}">GitHub</a>
+<div class="lang" role="navigation" aria-label="Language">{switch}</div></div></div></nav>
 <main>'''
 
 
-def foot(d, root):
-    data = {l: {**COMMON[l], **d[l]} for l in ("ko", "en", "zh")}
+def foot(lang, page, d):
+    root = rel_root(lang, page)
+    ui = {k: d[k] for k in ("_copied", "bar_n")}
     return f'''</main>
-<footer><div class="wrap"><a href="{REPO}">GitHub</a><a href="{root}insane-search/">insane-search</a><a href="{root}insane-research/">insane-research</a><span class="r" data-i="foot">{COMMON["en"]["foot"]}</span></div></footer>
-<script>window.I18N={json.dumps(data, ensure_ascii=False)};</script><script src="{root}assets/site.js"></script></body></html>'''
+<footer><div class="wrap"><a href="{REPO}">GitHub</a><a href="{root}{PREFIX[lang]}insane-search/">insane-search</a><a href="{root}{PREFIX[lang]}insane-research/">insane-research</a><span class="r">{d["foot"]}</span></div></footer>
+<script>window.UI={json.dumps(ui, ensure_ascii=False)};</script><script src="{root}assets/site.js"></script></body></html>'''
 
 
-def video(root, base, label_key, d):
-    return f'''<div class="media"><video data-base="{root}assets/media/{base}" src="{root}assets/media/{base}-en.mp4" poster="{root}assets/media/{base}-en-poster.png" autoplay muted loop playsinline data-i-attr="aria-label:{label_key}" aria-label="{d["en"][label_key]}"></video></div>
-<p class="cap" data-i="cap">{d["en"]["cap"]}</p>'''
+def install(lang, plugin):
+    c = COMMON[lang]
+    me = MKT + (f"\n/plugin install {plugin}@gptaku-plugins" if plugin else "")
+    return f'''<div class="install" role="group">
+  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="me">{c["tab_me"]}</button><button role="tab" aria-selected="false" data-tab="ai">{c["tab_ai"]}</button></div>
+  <div class="cmd" data-tab="me"><pre>{html.escape(me)}</pre><button class="copy" data-copy="1">{c["copy"]}</button></div>
+  <div class="cmd prompt" data-tab="ai" hidden><pre>{html.escape(ai_prompt(lang, plugin))}</pre><button class="copy" data-copy="1">{c["copy"]}</button></div>
+</div>'''
 
 
-# ---------------------------------------------------------------- 허브
-def build_hub():
-    d = {l: dict(HUB[l]) for l in HUB}
-    for l in d:
-        d[l]["ai"] = ai_prompt(l, "")
-        for n, *desc in PLUGINS:
-            d[l][f"p_{n}"] = desc[["ko", "en", "zh"].index(l)]
+def video(root, lang, base, d):
+    return f'''<div class="media"><video src="{root}assets/media/{base}-{lang}.mp4" poster="{root}assets/media/{base}-{lang}-poster.png" autoplay muted loop playsinline aria-label="{html.escape(plain(d["play_t"]))}"></video></div>
+<p class="cap">{d["cap"]}</p>'''
+
+
+def write(lang, page, body):
+    out = SITE / PREFIX[lang] / PAGES[page] / "index.html"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(body)
+
+
+ART_ALT = {"hub": "Pegboard of tools in violet ink with one coral ladder taken down",
+           "search": "Many violet routes stop at a wall with a 403 door; one coral route slips over the top",
+           "research": "Paper slips on violet threads pass through a sieve into a tall verified stack and a small annex tray"}
+
+
+def build_hub(lang):
+    d = {**COMMON[lang], **HUB[lang]}
+    root = rel_root(lang, "hub")
     rows = "".join(
-        f'<div class="row"><b>{n}</b>{i("p_" + n, d)}<label class="pick"><input type="checkbox" value="{n}"><span data-i="pick">{d["en"]["pick"]}</span></label></div>'
-        for n, *_ in PLUGINS)
-    body = f'''{head(d, "", "var(--coral)", "hub")}
+        f'<div class="row"><b>{n}</b><span>{desc[["ko", "en", "zh"].index(lang)]}</span><label class="pick"><input type="checkbox" value="{n}"><span>{d["pick"]}</span></label></div>'
+        for n, *desc in PLUGINS)
+    body = f'''{head(lang, "hub", d, "var(--coral)")}
 <header class="wrap hero split">
-  <div>{i("h1", d, "h1")}{i("lead", d, "p", "lead")}{install("")}</div>
-  <div class="art"><img src="assets/art/hub.jpg" alt="Pegboard of tools in violet ink with one coral ladder taken down" width="1600" height="900"></div>
+  <div><h1>{d["h1"]}</h1><p class="lead">{d["lead"]}</p>{install(lang, "")}</div>
+  <div class="art"><img src="{root}assets/art/hub.jpg" alt="{ART_ALT["hub"]}" width="1600" height="900"></div>
 </header>
 <section class="wrap">
-  {i("feat_t", d, "h2")}<div style="height:40px"></div>
+  <h2>{d["feat_t"]}</h2><div style="height:40px"></div>
   <div class="two">
-    <a class="card" href="insane-search/"><img class="thumb" src="assets/art/search.jpg" alt="" loading="lazy"><div class="pad"><h3>insane-search</h3>{i("s_t", d, "p")}<span class="more" data-i="see">{d["en"]["see"]}</span></div></a>
-    <a class="card" href="insane-research/"><img class="thumb" src="assets/art/research.jpg" alt="" loading="lazy"><div class="pad"><h3>insane-research</h3>{i("r_t", d, "p")}<span class="more" data-i="see">{d["en"]["see"]}</span></div></a>
+    <a class="card" href="{root}{PREFIX[lang]}insane-search/"><img class="thumb" src="{root}assets/art/search.jpg" alt="{ART_ALT["search"]}" width="1600" height="900" loading="lazy"><div class="pad"><h3>insane-search</h3><p>{d["s_t"]}</p><span class="more">{d["see"]}</span></div></a>
+    <a class="card" href="{root}{PREFIX[lang]}insane-research/"><img class="thumb" src="{root}assets/art/research.jpg" alt="{ART_ALT["research"]}" width="1600" height="900" loading="lazy"><div class="pad"><h3>insane-research</h3><p>{d["r_t"]}</p><span class="more">{d["see"]}</span></div></a>
   </div>
 </section>
-<section class="wrap" id="plugins">{i("all_t", d, "h2")}{i("all_s", d, "p", "sub")}<div class="rows">{rows}</div></section>
-<section class="wrap closing">{i("close_t", d, "h2")}{install("", "")}</section>
-<div class="bar" role="status"><b></b><button class="copy" data-copy="picked" data-i="bar_copy">{COMMON["en"]["bar_copy"]}</button><button class="clear" data-i="bar_clear">{COMMON["en"]["bar_clear"]}</button></div>
-{foot(d, "")}'''
-    (SITE / "index.html").write_text(body)
+<section class="wrap" id="plugins"><h2>{d["all_t"]}</h2><p class="sub">{d["all_s"]}</p><div class="rows">{rows}</div></section>
+<section class="wrap closing"><h2>{d["close_t"]}</h2>{install(lang, "")}</section>
+<div class="bar" role="status"><b></b><button class="copy" data-copy="picked">{d["bar_copy"]}</button><button class="clear">{d["bar_clear"]}</button></div>
+{foot(lang, "hub", d)}'''
+    write(lang, "hub", body)
 
 
-# ---------------------------------------------------------------- insane-search
-def build_search():
-    d = {l: dict(SEARCH[l]) for l in SEARCH}
-    for l in d:
-        d[l]["ai"] = ai_prompt(l, "insane-search")
-        d[l]["vlabel"] = d[l]["play_t"]
-    facts = "".join(f'<div class="row">{i(f"f{k}", d, "b")}{i(f"f{k}v", d)}{i(f"f{k}t", d)}</div>' for k in range(1, 5))
-    steps = "".join(f'<div class="step"><div class="n">0{k}</div><div>{i(f"st{k}", d, "h3")}{i(f"st{k}d", d, "p")}</div></div>' for k in range(1, 4))
-    body = f'''{head(d, "../", "#D97757", "search")}
-<header class="wrap hero center">{i("eyebrow", d, "span", "eyebrow")}{i("h1", d, "h1")}{i("lead", d, "p", "lead")}{install("insane-search")}</header>
-<div class="wrap artwide"><div class="art"><img src="../assets/art/search.jpg" alt="Many violet routes stop at a wall with a 403 door; one coral route slips over the top" width="1600" height="900"></div></div>
-<section class="wrap">{i("vs_t", d, "h2")}{i("vs_s", d, "p", "sub")}
+def build_search(lang):
+    d = {**COMMON[lang], **SEARCH[lang]}
+    root = rel_root(lang, "search")
+    facts = "".join(f'<div class="row"><b>{d[f"f{k}"]}</b><span>{d[f"f{k}v"]}</span><span>{d[f"f{k}t"]}</span></div>' for k in range(1, 5))
+    steps = "".join(f'<div class="step"><div class="n">0{k}</div><div><h3>{d[f"st{k}"]}</h3><p>{d[f"st{k}d"]}</p></div></div>' for k in range(1, 4))
+    body = f'''{head(lang, "search", d, "#D97757")}
+<header class="wrap hero center"><span class="eyebrow">{d["eyebrow"]}</span><h1>{d["h1"]}</h1><p class="lead">{d["lead"]}</p>{install(lang, "insane-search")}</header>
+<div class="wrap artwide"><div class="art"><img src="{root}assets/art/search.jpg" alt="{ART_ALT["search"]}" width="1600" height="900"></div></div>
+<section class="wrap"><h2>{d["vs_t"]}</h2><p class="sub">{d["vs_s"]}</p>
   <div class="two">
-    <div class="card panel">{i("vs_a", d, "div", "lbl")}<div class="big red">403</div>{i("vs_a_n", d, "div", "note")}</div>
-    <div class="card panel">{i("vs_b", d, "div", "lbl")}<div class="big" style="color:var(--ok)" data-i="vs_b_big">{d["en"]["vs_b_big"]}</div>{i("vs_b_n", d, "div", "note")}</div>
+    <div class="card panel"><div class="lbl">{d["vs_a"]}</div><div class="big red">403</div><div class="note">{d["vs_a_n"]}</div></div>
+    <div class="card panel"><div class="lbl">{d["vs_b"]}</div><div class="big" style="color:var(--ok)">{d["vs_b_big"]}</div><div class="note">{d["vs_b_n"]}</div></div>
   </div></section>
-<section class="wrap">{i("play_t", d, "h2")}{video("../", "search", "vlabel", d)}</section>
-<section class="wrap">{i("facts_t", d, "h2")}<div style="height:40px"></div><div class="rows">{facts}</div></section>
-<section class="wrap narrow">{i("how_t", d, "h2")}<div class="steps">{steps}</div></section>
-<section class="wrap narrow">{i("honest_t", d, "h2")}<div style="height:24px"></div>{i("honest", d, "p", "honest")}</section>
-<section class="wrap closing">{i("close_t", d, "h2")}{install("insane-search")}</section>
-{foot(d, "../")}'''
-    (SITE / "insane-search" / "index.html").write_text(body)
+<section class="wrap"><h2>{d["play_t"]}</h2>{video(root, lang, "search", d)}</section>
+<section class="wrap"><h2>{d["facts_t"]}</h2><p class="sub">{d["facts_s"]}</p><div class="rows">{facts}</div></section>
+<section class="wrap narrow"><h2>{d["how_t"]}</h2><div class="steps">{steps}</div></section>
+<section class="wrap narrow"><h2>{d["honest_t"]}</h2><div style="height:24px"></div><p class="honest">{d["honest"]}</p></section>
+<section class="wrap closing"><h2>{d["close_t"]}</h2>{install(lang, "insane-search")}</section>
+{foot(lang, "search", d)}'''
+    write(lang, "search", body)
 
 
-# ---------------------------------------------------------------- insane-research
-def build_research():
-    d = {l: dict(RESEARCH[l]) for l in RESEARCH}
-    for l in d:
-        d[l]["ai"] = ai_prompt(l, "insane-research")
-        d[l]["vlabel"] = d[l]["play_t"]
-    body = f'''{head(d, "../", "#3FB950", "research")}
-<header class="wrap hero center">{i("eyebrow", d, "span", "eyebrow")}{i("h1", d, "h1")}{i("lead", d, "p", "lead")}{install("insane-research")}</header>
-<div class="wrap artwide"><div class="art"><img src="../assets/art/research.jpg" alt="Paper slips on violet threads pass through a sieve into a tall verified stack and a small annex tray" width="1600" height="900"></div></div>
+def build_research(lang):
+    d = {**COMMON[lang], **RESEARCH[lang]}
+    root = rel_root(lang, "research")
+    body = f'''{head(lang, "research", d, "#3FB950")}
+<header class="wrap hero center"><span class="eyebrow">{d["eyebrow"]}</span><h1>{d["h1"]}</h1><p class="lead">{d["lead"]}</p>{install(lang, "insane-research")}</header>
+<div class="wrap artwide"><div class="art"><img src="{root}assets/art/research.jpg" alt="{ART_ALT["research"]}" width="1600" height="900"></div></div>
 <section class="wrap"><div class="stats">
-  <div><b>8</b>{i("n1", d)}</div><div><b>109</b>{i("n2", d)}</div><div><b><span style="color:var(--ok)">42</span> / <span style="color:var(--warn)">32</span></b>{i("n3", d)}</div>
-</div><p class="cap" style="text-align:center;margin-top:36px" data-i="nums_s">{d["en"]["nums_s"]}</p></section>
-<section class="wrap">{i("play_t", d, "h2")}{video("../", "research", "vlabel", d)}</section>
-<section class="wrap narrow">{i("gate_t", d, "h2")}<div style="height:24px"></div>{i("gate", d, "p", "honest")}</section>
-<section class="wrap">{i("sample_t", d, "h2")}<div style="height:40px"></div>
-  <a class="card" href="sample/"><div class="pad" style="padding:48px">{i("sample_tag", d, "span", "tag")}{i("sample_h", d, "h3")}{i("sample_p", d, "p")}<span class="more" data-i="sample_go">{d["en"]["sample_go"]}</span></div></a></section>
-<section class="wrap narrow">{i("honest_t", d, "h2")}<div style="height:24px"></div>{i("honest", d, "p", "honest")}</section>
-<section class="wrap closing">{i("close_t", d, "h2")}{install("insane-research")}</section>
-{foot(d, "../")}'''
-    (SITE / "insane-research" / "index.html").write_text(body)
+  <div><b>8</b><span>{d["n1"]}</span></div><div><b>109</b><span>{d["n2"]}</span></div><div><b><span style="color:var(--ok)">42</span> / <span style="color:var(--warn)">32</span></b><span>{d["n3"]}</span></div>
+</div><p class="cap" style="text-align:center;margin-top:36px">{d["nums_s"]}</p></section>
+<section class="wrap"><h2>{d["play_t"]}</h2>{video(root, lang, "research", d)}</section>
+<section class="wrap narrow"><h2>{d["gate_t"]}</h2><div style="height:24px"></div><p class="honest">{d["gate"]}</p></section>
+<section class="wrap"><h2>{d["sample_t"]}</h2><div style="height:40px"></div>
+  <a class="card" href="{root}insane-research/sample/" hreflang="ko"><div class="pad" style="padding:48px"><span class="tag">{d["sample_tag"]}</span><h3>{d["sample_h"]}</h3><p>{d["sample_p"]}</p><span class="more">{d["sample_go"]}</span></div></a></section>
+<section class="wrap narrow"><h2>{d["honest_t"]}</h2><div style="height:24px"></div><p class="honest">{d["honest"]}</p></section>
+<section class="wrap closing"><h2>{d["close_t"]}</h2>{install(lang, "insane-research")}</section>
+{foot(lang, "research", d)}'''
+    write(lang, "research", body)
+
+
+def build_sitemap():
+    """hreflang 묶음을 사이트맵에도 싣는다(Google이 인정하는 세 방식 중 하나). 샘플 리포트는 한국어 단독."""
+    today = "2026-09-28"
+    out = ['<?xml version="1.0" encoding="UTF-8"?>',
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">']
+    for page in PAGES:
+        links = "".join(f'<xhtml:link rel="alternate" hreflang="{HTML_LANG[l]}" href="{url(l, page)}"/>' for l in LANGS)
+        links += f'<xhtml:link rel="alternate" hreflang="x-default" href="{url("en", page)}"/>'
+        for l in LANGS:
+            out.append(f"<url><loc>{url(l, page)}</loc><lastmod>{today}</lastmod>{links}</url>")
+    out.append(f"<url><loc>{BASE}insane-research/sample/</loc><lastmod>{today}</lastmod></url>")
+    out.append("</urlset>")
+    (SITE / "sitemap.xml").write_text("\n".join(out) + "\n")
+    # 프로젝트 페이지라 크롤러는 호스트 루트(fivetaku.github.io/robots.txt)만 읽는다.
+    # 이 파일은 사이트맵 위치를 알리는 보조 용도이고, 제출은 Search Console에서 한다.
+    (SITE / "robots.txt").write_text(f"User-agent: *\nAllow: /\n\nSitemap: {BASE}sitemap.xml\n")
 
 
 if __name__ == "__main__":
-    build_hub()
-    build_search()
-    build_research()
+    for lang in LANGS:
+        build_hub(lang)
+        build_search(lang)
+        build_research(lang)
+    build_sitemap()
     print("built", SITE)

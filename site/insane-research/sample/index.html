@@ -1,11 +1,42 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>샘플 리포트 — insane-research</title><link rel="stylesheet" href="../../assets/site.css">
+<title>insane-research 샘플 리포트 — Claude Code 멀티세션 앱 번들 ID와 Windows 알림 조사</title><meta name="description" content="insane-research로 만든 실제 리서치 리포트 원문입니다. 에이전트 8개가 소스 109건을 모아 주장 74건을 검증했고, 42건은 본문에, 32건은 부록에 실었습니다."><link rel="canonical" href="https://fivetaku.github.io/gptaku_plugins/insane-research/sample/"><meta property="og:type" content="article"><meta property="og:site_name" content="gptaku plugins"><meta property="og:title" content="insane-research 샘플 리포트 — Claude Code 멀티세션 앱 번들 ID와 Windows 알림 조사"><meta property="og:description" content="insane-research로 만든 실제 리서치 리포트 원문입니다. 에이전트 8개가 소스 109건을 모아 주장 74건을 검증했고, 42건은 본문에, 32건은 부록에 실었습니다."><meta property="og:url" content="https://fivetaku.github.io/gptaku_plugins/insane-research/sample/"><meta property="og:locale" content="ko_KR"><meta property="og:image" content="https://fivetaku.github.io/gptaku_plugins/assets/art/research.jpg"><meta property="og:image:width" content="1600"><meta property="og:image:height" content="900"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://fivetaku.github.io/gptaku_plugins/assets/art/research.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Report","headline":"ddiring 터미널 매핑·Windows 알림 리서치","inLanguage":"ko","datePublished":"2026-08-23","author":{"@type":"Person","name":"fivetaku","url":"https://github.com/fivetaku"},"image":"https://fivetaku.github.io/gptaku_plugins/assets/art/research.jpg","url":"https://fivetaku.github.io/gptaku_plugins/insane-research/sample/","isBasedOn":"https://github.com/fivetaku/insane-research"}</script><link rel="stylesheet" href="../../assets/site.css">
 <style>.doc{max-width:860px;margin:0 auto;padding:40px 24px 80px}.doc h1{font-size:32px}.doc h2{font-size:24px;margin-top:40px}.doc h3{font-size:18px}
 .doc table{display:block;overflow-x:auto;max-width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:16px 0}.doc code{font:13px var(--mono);background:#1c1c26;padding:1px 5px;border-radius:5px}
 .banner{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:14px;color:var(--mute);margin-bottom:28px}.banner b{color:var(--text)}</style></head><body>
-<nav><div class="wrap"><a class="brand" href="../../"><img src="../../assets/logo.svg" alt="">gptaku plugins</a><div class="links"><a href="../">insane-research</a></div></div></nav>
+<nav><div class="wrap"><a class="brand" href="../../"><span class="logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6E56CF" />
+      <stop offset="100%" stop-color="#D97757" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Outer glowing background -->
+  <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad)" filter="url(#shadow)" />
+  
+  <!-- Inner dark plate for contrast -->
+  <rect x="26" y="26" width="148" height="148" rx="34" fill="#0d1117" />
+  
+  <!-- Stylized Marketplace Plugin Icon (Plug & Socket Connection) -->
+  <g transform="translate(50, 50)">
+    <!-- Socket Plate -->
+    <rect x="25" y="20" width="50" height="50" rx="10" fill="url(#brand-grad)" opacity="0.15" />
+    <rect x="30" y="25" width="40" height="40" rx="8" fill="none" stroke="url(#brand-grad)" stroke-width="3" />
+    
+    <!-- Plug connection lines -->
+    <path d="M10 45 L35 45" stroke="url(#brand-grad)" stroke-width="4" stroke-linecap="round" />
+    <path d="M90 45 L65 45" stroke="url(#brand-grad)" stroke-width="4" stroke-linecap="round" />
+    
+    <!-- Central connection node -->
+    <circle cx="50" cy="45" r="10" fill="url(#brand-grad)" />
+    <circle cx="50" cy="45" r="4" fill="#0d1117" />
+  </g>
+</svg></span>gptaku plugins</a><div class="links"><a href="../">insane-research</a></div></div></nav>
 <main class="doc" style="overflow-wrap:anywhere">
-<div class="banner"><b>실제 산출물 원문입니다.</b> 2026-08-23, 우리 플러그인 ddiring 개발 중에 <code>/insane-research</code> 한 번으로 만든 리포트를 손대지 않고 옮겼습니다. 에이전트 8개 · 소스 109건 · 주장 74건 중 검증 42 / 미확정 32 / 반박 0 · <code>validate_ledger.py</code> PASS.</div>
+<div class="banner"><b>실제 산출물 원문입니다.</b> 2026-08-23, 우리 플러그인 ddiring 개발 중에 <code>/insane-research</code> 한 번으로 만든 리포트를 손대지 않고 옮겼습니다. 에이전트 8개 · 소스 109건 · 주장 74건 중 검증 42 / 미확정 32 / 반박 0 · <code>validate_ledger.py</code> PASS. 아래 원문 요약의 "소스 102건"은 작성 시점 수치이고, 최종 소스 장부(<code>sources.jsonl</code>)는 109건입니다.</div>
 <h1 id="ddiring-터미널-매핑windows-알림-리서치--요약-2026-08-23">ddiring
 터미널 매핑·Windows 알림 리서치 — 요약 (2026-08-23)</h1>
 <p>8개 에이전트 팬아웃(4축+확장 4), 소스 102건, 주장 74건 중
@@ -46,9 +77,9 @@ powershell.exe interop 경유.</li>
 <code>unresolved_claims.json</code>.</li>
 </ul>
 <hr />
-<h1
+<h2
 id="ddiring-터미널-매핑--windows-알림-구현-리서치-2026-08-23">ddiring
-터미널 매핑 + Windows 알림 구현 리서치 (2026-08-23)</h1>
+터미널 매핑 + Windows 알림 구현 리서치 (2026-08-23)</h2>
 <blockquote>
 <p>본문은 <strong>검증(verified) 주장만</strong> 단정형으로 기술한다.
 단일 출처 등으로 교차검증 미달인 항목은 맨 아래

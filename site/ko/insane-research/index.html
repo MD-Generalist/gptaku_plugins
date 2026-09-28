@@ -1,0 +1,70 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>insane-research — 출처를 검증하는 Claude Code 딥리서치 플러그인</title><meta name="description" content="질문 하나를 주면 에이전트 여럿이 웹과 학술 자료를 동시에 조사해 인용이 달린 리포트로 정리합니다. 모든 출처에 A~E 등급을 매기고, 두 곳 이상에서 확인되지 않은 주장은 본문 대신 부록으로 보냅니다.">
+<link rel="canonical" href="https://fivetaku.github.io/gptaku_plugins/ko/insane-research/"><link rel="alternate" hreflang="en" href="https://fivetaku.github.io/gptaku_plugins/insane-research/"><link rel="alternate" hreflang="ko" href="https://fivetaku.github.io/gptaku_plugins/ko/insane-research/"><link rel="alternate" hreflang="zh-Hans" href="https://fivetaku.github.io/gptaku_plugins/zh/insane-research/"><link rel="alternate" hreflang="x-default" href="https://fivetaku.github.io/gptaku_plugins/insane-research/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="gptaku plugins"><meta property="og:title" content="insane-research — 출처를 검증하는 Claude Code 딥리서치 플러그인">
+<meta property="og:description" content="질문 하나를 주면 에이전트 여럿이 웹과 학술 자료를 동시에 조사해 인용이 달린 리포트로 정리합니다. 모든 출처에 A~E 등급을 매기고, 두 곳 이상에서 확인되지 않은 주장은 본문 대신 부록으로 보냅니다."><meta property="og:url" content="https://fivetaku.github.io/gptaku_plugins/ko/insane-research/"><meta property="og:locale" content="ko_KR"><meta property="og:locale:alternate" content="en_US"><meta property="og:locale:alternate" content="zh_CN">
+<meta property="og:image" content="https://fivetaku.github.io/gptaku_plugins/assets/art/research.jpg"><meta property="og:image:width" content="1600"><meta property="og:image:height" content="900">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="insane-research — 출처를 검증하는 Claude Code 딥리서치 플러그인"><meta name="twitter:description" content="질문 하나를 주면 에이전트 여럿이 웹과 학술 자료를 동시에 조사해 인용이 달린 리포트로 정리합니다. 모든 출처에 A~E 등급을 매기고, 두 곳 이상에서 확인되지 않은 주장은 본문 대신 부록으로 보냅니다."><meta name="twitter:image" content="https://fivetaku.github.io/gptaku_plugins/assets/art/research.jpg">
+<link rel="icon" href="../../assets/logo.svg"><link rel="stylesheet" href="../../assets/site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "insane-research", "applicationCategory": "DeveloperApplication", "applicationSubCategory": "Claude Code plugin", "operatingSystem": "macOS, Linux, Windows", "description": "질문 하나를 주면 에이전트 여럿이 웹과 학술 자료를 동시에 조사해 인용이 달린 리포트로 정리합니다. 모든 출처에 A~E 등급을 매기고, 두 곳 이상에서 확인되지 않은 주장은 본문 대신 부록으로 보냅니다.", "url": "https://fivetaku.github.io/gptaku_plugins/ko/insane-research/", "inLanguage": "ko", "license": "https://opensource.org/licenses/MIT", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "sameAs": ["https://github.com/fivetaku/insane-research"], "author": {"@type": "Person", "name": "fivetaku", "url": "https://github.com/fivetaku"}, "image": "https://fivetaku.github.io/gptaku_plugins/assets/art/research.jpg"}</script>
+<style>:root{--accent:#3FB950}</style></head><body class="research">
+<nav><div class="wrap"><a class="brand" href="../../ko/"><span class="logo" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6E56CF" />
+      <stop offset="100%" stop-color="#D97757" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Outer glowing background -->
+  <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad)" filter="url(#shadow)" />
+  
+  <!-- Inner dark plate for contrast -->
+  <rect x="26" y="26" width="148" height="148" rx="34" fill="#0d1117" />
+  
+  <!-- Stylized Marketplace Plugin Icon (Plug & Socket Connection) -->
+  <g transform="translate(50, 50)">
+    <!-- Socket Plate -->
+    <rect x="25" y="20" width="50" height="50" rx="10" fill="url(#brand-grad)" opacity="0.15" />
+    <rect x="30" y="25" width="40" height="40" rx="8" fill="none" stroke="url(#brand-grad)" stroke-width="3" />
+    
+    <!-- Plug connection lines -->
+    <path d="M10 45 L35 45" stroke="url(#brand-grad)" stroke-width="4" stroke-linecap="round" />
+    <path d="M90 45 L65 45" stroke="url(#brand-grad)" stroke-width="4" stroke-linecap="round" />
+    
+    <!-- Central connection node -->
+    <circle cx="50" cy="45" r="10" fill="url(#brand-grad)" />
+    <circle cx="50" cy="45" r="4" fill="#0d1117" />
+  </g>
+</svg></span>gptaku plugins</a>
+<div class="links"><a href="../../ko/#plugins">플러그인</a><a href="https://github.com/fivetaku/gptaku_plugins">GitHub</a>
+<div class="lang" role="navigation" aria-label="Language"><a href="../../insane-research/" hreflang="en" lang="en">EN</a><a href="../../ko/insane-research/" hreflang="ko" lang="ko" aria-current="true">한국어</a><a href="../../zh/insane-research/" hreflang="zh-Hans" lang="zh-Hans">中文</a></div></div></div></nav>
+<main>
+<header class="wrap hero center"><span class="eyebrow">Claude Code 플러그인 · 멀티에이전트 딥리서치</span><h1>그럴듯함은<br><span class="acc">근거가 아니다.</span></h1><p class="lead">질문 하나를 주면 에이전트 여럿이 웹과 학술 자료를 동시에 조사해 인용이 달린 리포트로 정리합니다. 모든 출처에 A~E 등급을 매기고, 두 곳 이상에서 확인되지 않은 주장은 본문 대신 부록으로 보냅니다.</p><div class="install" role="group">
+  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="me">직접 설치</button><button role="tab" aria-selected="false" data-tab="ai">Claude에게 맡기기</button></div>
+  <div class="cmd" data-tab="me"><pre>/plugin marketplace add https://github.com/fivetaku/gptaku_plugins.git
+/plugin install insane-research@gptaku-plugins</pre><button class="copy" data-copy="1">복사</button></div>
+  <div class="cmd prompt" data-tab="ai" hidden><pre>터미널에서 `claude plugin marketplace add fivetaku/gptaku_plugins`와 `claude plugin install insane-research@gptaku-plugins`를 실행해 설치해 줘. 끝나면 Claude Code를 재시작하라고 알려줘.</pre><button class="copy" data-copy="1">복사</button></div>
+</div></header>
+<div class="wrap artwide"><div class="art"><img src="../../assets/art/research.jpg" alt="Paper slips on violet threads pass through a sieve into a tall verified stack and a small annex tray" width="1600" height="900"></div></div>
+<section class="wrap"><div class="stats">
+  <div><b>8</b><span>에이전트</span></div><div><b>109</b><span>출처</span></div><div><b><span style="color:var(--ok)">42</span> / <span style="color:var(--warn)">32</span></b><span>본문 / 부록</span></div>
+</div><p class="cap" style="text-align:center;margin-top:36px">아래 샘플 리포트 한 건의 실제 수치입니다.</p></section>
+<section class="wrap"><h2>질문 하나가 리포트가 되기까지</h2><div class="media"><video src="../../assets/media/research-ko.mp4" poster="../../assets/media/research-ko-poster.png" autoplay muted loop playsinline aria-label="질문 하나가 리포트가 되기까지"></video></div>
+<p class="cap">실제 리서치 세션(2026-08-23)의 기록을 재생한 화면입니다.</p></section>
+<section class="wrap narrow"><h2>검사는 코드가 합니다</h2><div style="height:24px"></div><p class="honest">주장마다 출처를 장부에 적고, <code>validate_ledger.py</code>가 그 장부를 검사합니다. 통과하지 못하면 리포트 단계로 넘어가지 않습니다. 모델이 "확인했다"고 말하는 것만으로는 부족합니다.</p></section>
+<section class="wrap"><h2>샘플 리포트</h2><div style="height:40px"></div>
+  <a class="card" href="../../insane-research/sample/" hreflang="ko"><div class="pad" style="padding:48px"><span class="tag">실제 산출물</span><h3>Claude Code 멀티세션 앱 번들 ID와<br>Windows 알림 구현 방법</h3><p>우리 알림 플러그인을 만들 때 실제로 쓴 리포트를 고치지 않고 공개합니다.</p><span class="more">원문 보기 →</span></div></a></section>
+<section class="wrap narrow"><h2>솔직하게</h2><div style="height:24px"></div><p class="honest">개요만 빨리 필요하면 ChatGPT나 Gemini의 딥리서치가 더 편합니다. insane-research는 질문을 몇 개 되묻고 시간도 더 걸립니다. 기술 선택, 구현 근거, 숫자처럼 틀리면 손해가 큰 결정에 쓰세요.</p></section>
+<section class="wrap closing"><h2>틀리면 손해가 큰<br>결정 앞에서.</h2><div class="install" role="group">
+  <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="me">직접 설치</button><button role="tab" aria-selected="false" data-tab="ai">Claude에게 맡기기</button></div>
+  <div class="cmd" data-tab="me"><pre>/plugin marketplace add https://github.com/fivetaku/gptaku_plugins.git
+/plugin install insane-research@gptaku-plugins</pre><button class="copy" data-copy="1">복사</button></div>
+  <div class="cmd prompt" data-tab="ai" hidden><pre>터미널에서 `claude plugin marketplace add fivetaku/gptaku_plugins`와 `claude plugin install insane-research@gptaku-plugins`를 실행해 설치해 줘. 끝나면 Claude Code를 재시작하라고 알려줘.</pre><button class="copy" data-copy="1">복사</button></div>
+</div></section>
+</main>
+<footer><div class="wrap"><a href="https://github.com/fivetaku/gptaku_plugins">GitHub</a><a href="../../ko/insane-search/">insane-search</a><a href="../../ko/insane-research/">insane-research</a><span class="r">MIT 라이선스 · 만든 사람 <a href="https://github.com/fivetaku">fivetaku</a> · 비공식 커뮤니티 플러그인 (Anthropic과 무관)</span></div></footer>
+<script>window.UI={"_copied": "복사됨", "bar_n": "{n}개 담음"};</script><script src="../../assets/site.js"></script></body></html>

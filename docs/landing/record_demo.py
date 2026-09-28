@@ -1,10 +1,15 @@
 """데모 HTML(window.seek)을 프레임 캡처해 mp4 + poster로 굽는다.
-사용: python3 docs/landing/record_demo.py  (site/를 18431로 서빙 중이어야 함)"""
+
+데모 HTML은 녹화 전용이라 공개 사이트(site/)가 아니라 docs/landing/demo/에 둔다.
+docs/landing/assets는 site/assets를 가리키는 심볼릭 링크다.
+사용: python3 docs/landing/record_demo.py [search|research]
+      (녹화용 서버를 스크립트가 직접 띄웠다가 끈다)"""
 import os, shutil, subprocess, sys, tempfile
 from concurrent.futures import ThreadPoolExecutor
 from playwright.sync_api import sync_playwright
 
-BASE = "http://127.0.0.1:18431/demo"
+PORT = 18432
+BASE = f"http://127.0.0.1:{PORT}/demo"
 MEDIA = os.path.join(os.path.dirname(__file__), "..", "..", "site", "assets", "media")
 JOBS = [(d, l, dur) for d, dur in (("search", 11), ("research", 11.5)) for l in ("en", "ko", "zh")]
 FPS = 30
@@ -27,7 +32,19 @@ def rec(job):
     return out
 
 if __name__ == "__main__":
+    here = os.path.dirname(os.path.abspath(__file__))
+    srv = subprocess.Popen([sys.executable, "-m", "http.server", str(PORT), "--bind", "127.0.0.1", "--directory", here],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    import time, urllib.request
+    for _ in range(50):
+        try:
+            urllib.request.urlopen(f"{BASE}/search.html", timeout=1); break
+        except Exception:
+            time.sleep(0.2)
     only = sys.argv[1:]
     jobs = [j for j in JOBS if not only or j[0] in only]
     with ThreadPoolExecutor(6) as ex:
-        for o in ex.map(rec, jobs): print("done", o)
+        try:
+            for o in ex.map(rec, jobs): print("done", o)
+        finally:
+            srv.terminate()

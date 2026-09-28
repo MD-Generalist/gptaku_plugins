@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://fivetaku.github.io/gptaku_plugins/sitemap.xml

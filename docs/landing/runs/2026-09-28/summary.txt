@@ -1,0 +1,4 @@
+reddit plain=200 elapsed=1.3s :: [engine] ok=True verdict=strong_ok profile=phase0:reddit attempts=1 :: === summary: Phase 0 official route: reddit:rss ===
+naver plain=302 elapsed=0.9s :: [engine] ok=True verdict=weak_ok profile=unknown_challenge attempts=2 :: === summary: curl_cffi safari + m_prefix_subdomain + referer:self_root → weak_ok (content=raw+md, q=0.44) ===
+x plain=402 elapsed=2.5s :: [engine] ok=True verdict=weak_ok profile=None attempts=3 :: === summary: curl_cffi safari + original + referer:self_root → weak_ok (content=raw+md, q=0.81) ===
+coupang plain=403 elapsed=13.9s :: [engine] ok=True verdict=weak_ok profile=akamai_bot_manager attempts=18 :: === summary: curl_cffi chrome100 + mobile_subdomain + referer:self_root → weak_ok (content=raw+md, q=0.63) ===

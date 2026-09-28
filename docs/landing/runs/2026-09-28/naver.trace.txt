@@ -1,0 +1,10 @@
+=== trace ===
+[probe   ] curl_cffi          xform=original         imp=safari         ref=self_root      status= 200 size=    2928 verdict=challenge 
+[grid    ] curl_cffi          xform=m_prefix_subdomain imp=safari         ref=self_root      status= 200 size=   25656 verdict=weak_ok 
+=== summary: curl_cffi safari + m_prefix_subdomain + referer:self_root → weak_ok (content=raw+md, q=0.44) ===
+[engine] ok=True verdict=weak_ok profile=unknown_challenge attempts=2
+[BEGIN UNTRUSTED WEB CONTENT] boundary=ae19d3839ba6c1f3
+[![naverofficial](https://blogpfthumb-phinf.pstatic.net/MjAyMjAxMTlfMzUg/MDAxNjQyNTUzNzgzNDYw.jdhCkBBFGYJyrnyuHtf1qqqqnLiKKw8aIaWqFvpeixcg.uy2YoZsakoinNOSSDOlxopn2Q-0uYnA1MZdNA09DDTQg.PNG.naver_diary/Profile.png/Profile.png?type=s1)](https://blogpfthumb-phinf.pstatic.net/MjAyMjAxMTlfMzUg/MDAxNjQyNTUzNzgzNDYw.jdhCkBBFGYJyrnyuHtf1qqqqnLiKKw8aIaWqFvpeixcg.uy2YoZsakoinNOSSDOlxopn2Q-0uYnA1MZdNA09DDTQg.PNG.naver_diary/Profile.png/Profile.png)
+[naverofficial](/naverofficial)*공식 블로그*
+[*안부글*](https://m.blog.naver.com/GuestbookList.naver?blogId=naverofficial)[*이웃목록*](https://m.blog.naver.com/BuddyList.naver?blogId=naverofficial)*앱알림 비활성화됨, 앱알림 활성화하기*
+[END UNTRUSTED WEB CONTENT] boundary=ae19d3839ba6c1f3

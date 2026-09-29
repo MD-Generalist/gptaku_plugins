@@ -1,0 +1,96 @@
+{
+  "name": "gptaku-landing-search",
+  "url": "https://fivetaku.github.io/gptaku_plugins/insane-search/",
+  "taken_at": "2026-09-29",
+  "remeasure_due": "2026-10-13",
+  "gate_c": {
+    "target": "https://fivetaku.github.io/gptaku_plugins/insane-search/",
+    "input_kind": "url",
+    "gates_run": [
+      "C"
+    ],
+    "notes": [],
+    "ran_at": "2026-09-29T17:59:53",
+    "gates": [
+      {
+        "gate": "C",
+        "target_kind": "deployed_url",
+        "results": [
+          {
+            "id": "LIVE-http-ok",
+            "status": "UNVERIFIABLE",
+            "severity": "blocker",
+            "detail": "WAF 챌린지 페이지 감지",
+            "evidence": "https://developers.google.com/search/docs/essentials",
+            "grade": "B"
+          },
+          {
+            "id": "LIVE-noindex-headers",
+            "status": "PASS",
+            "severity": "blocker",
+            "detail": "헤더·메타 양쪽 noindex 없음",
+            "evidence": "https://developers.google.com/search/docs/crawling-indexing/robots-meta-tag",
+            "grade": "B"
+          },
+          {
+            "id": "LIVE-jsonld-nojs",
+            "status": "UNVERIFIABLE",
+            "severity": "warn",
+            "detail": "WAF 챌린지 페이지 감지",
+            "evidence": "https://nextjs.org/docs/app/getting-started/metadata-and-og-images",
+            "grade": "B"
+          },
+          {
+            "id": "LIVE-ssr-content",
+            "status": "UNVERIFIABLE",
+            "severity": "blocker",
+            "detail": "WAF 챌린지 페이지 감지",
+            "evidence": "https://searchadvisor.naver.com/guide/seo-advanced-javascript",
+            "grade": "B"
+          },
+          {
+            "id": "LIVE-robots-sitemap",
+            "status": "PASS",
+            "severity": "blocker",
+            "detail": "robots.txt 없음(HTTP 404) — 제한 없음으로 해석됨 · sitemap 미발견(색인 실패 요인 아님 — 대형·신규 사이트는 제출 권장)",
+            "evidence": "https://searchadvisor.naver.com/guide/seo-basic-robots",
+            "grade": "B"
+          },
+          {
+            "id": "LIVE-404-real",
+            "status": "PASS",
+            "severity": "warn",
+            "detail": "없는 경로 → 404",
+            "evidence": "https://searchadvisor.naver.com/guide/seo-advanced-indexing",
+            "grade": "B"
+          },
+          {
+            "id": "LIVE-ai-crawler-access",
+            "status": "UNVERIFIABLE",
+            "severity": "warn",
+            "detail": "robots.txt: HTTP 404",
+            "evidence": "https://dl.acm.org/doi/10.1145/3805712.3809667",
+            "grade": "B"
+          }
+        ]
+      }
+    ],
+    "disclaimer": "이 검사는 노출 실패 요인 제거이지 검색 순위 상승을 보장하지 않습니다.",
+    "summary": {
+      "PASS": 3,
+      "FAIL": 0,
+      "SKIPPED": 0,
+      "UNVERIFIABLE": 4
+    },
+    "blocker_failures": []
+  },
+  "manual_kpis": {
+    "_note": "API가 없는 지표는 직접 채운다. 최근 28일 기준, 집계 지연으로 최근 2~3일 제외.",
+    "gsc_impressions_28d": null,
+    "gsc_clicks_28d": null,
+    "naver_impressions_28d": null,
+    "naver_clicks_28d": null,
+    "indexed_pages_gsc": null
+  },
+  "citation_queries": []
+}

@@ -136,6 +136,43 @@ class PluginReleaseTests(unittest.TestCase):
         _ = self.git(self.plugin, "checkout", "-b", "unrelated")
         self.assert_refused_unchanged("demo", "feature")
 
+    def assert_pending_sequence_refused(self, repo: Path, filename: str) -> None:
+        # A plain commit clears CHERRY_PICK_HEAD but leaves the multi-pick todo.
+        _ = self.git(repo, "checkout", "-b", "sequence-source")
+        target = repo / filename
+        _ = target.write_text("incoming first\n", encoding="utf-8")
+        _ = self.git(repo, "add", filename)
+        _ = self.git(repo, "commit", "-m", "first incoming")
+        first = self.git(repo, "rev-parse", "HEAD")
+        _ = (repo / "sequence-next.txt").write_text("next\n", encoding="utf-8")
+        _ = self.git(repo, "add", "sequence-next.txt")
+        _ = self.git(repo, "commit", "-m", "second incoming")
+        second = self.git(repo, "rev-parse", "HEAD")
+        _ = self.git(repo, "checkout", "main")
+        _ = target.write_text("local conflict\n", encoding="utf-8")
+        _ = self.git(repo, "add", filename)
+        _ = self.git(repo, "commit", "-m", "local change")
+        result = subprocess.run(["git", "-C", str(repo), "cherry-pick", first, second],
+                                env=self.env, capture_output=True, text=True, timeout=20)
+        self.assertNotEqual(result.returncode, 0)
+        _ = target.write_text("resolved first\n", encoding="utf-8")
+        _ = self.git(repo, "add", filename)
+        _ = self.git(repo, "commit", "-m", "resolve with plain commit")
+        self.assertEqual(self.git(repo, "status", "--porcelain"), "")
+        sequence = Path(self.git(repo, "rev-parse", "--path-format=absolute", "--git-path", "sequencer"))
+        cherry_head = Path(self.git(repo, "rev-parse", "--path-format=absolute", "--git-path", "CHERRY_PICK_HEAD"))
+        self.assertTrue(sequence.is_dir())
+        self.assertFalse(cherry_head.exists())
+        before = {p.name: p.read_bytes() for p in sequence.iterdir() if p.is_file()}
+        self.assert_refused_unchanged("demo", "feature")
+        self.assertEqual({p.name: p.read_bytes() for p in sequence.iterdir() if p.is_file()}, before)
+
+    def test_refuses_pending_parent_sequence_with_clean_index(self) -> None:
+        self.assert_pending_sequence_refused(self.root, "unrelated.txt")
+
+    def test_refuses_pending_plugin_sequence_with_clean_index(self) -> None:
+        self.assert_pending_sequence_refused(self.plugin, "CHANGELOG.md")
+
     def test_refuses_detached_plugin(self) -> None:
         _ = self.git(self.plugin, "checkout", "--detach")
         self.assert_refused_unchanged("demo", "feature")

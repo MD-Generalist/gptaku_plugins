@@ -9,11 +9,32 @@
 #   예: plugin-release.sh pumasi feat/cursor-worker --push
 set -euo pipefail
 
-PLUGIN="${1:?플러그인명 필요 (예: pumasi)}"
-BRANCH="${2:?작업 브랜치 필요 (예: feat/xxx)}"
+fail() { echo "ERROR: $*" >&2; exit 1; }
+[[ $# == 2 || ( $# == 3 && ${3} == --push ) ]] || fail 'Usage: plugin-release.sh <plugin> <source-branch> [--push]'
+PLUGIN="$1"
+BRANCH="$2"
+[[ "$PLUGIN" =~ ^[A-Za-z0-9][A-Za-z0-9_-]*$ ]] || fail 'Invalid plugin name'
+git check-ref-format --branch "$BRANCH" >/dev/null || fail 'Invalid branch name'
+[[ "$BRANCH" != main ]] || fail 'Source branch must differ from main'
 PUSH="${3:-}"
-ROOT="$HOME/gptaku_plugins"
+ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 SUB="$ROOT/plugins/$PLUGIN"
+
+[[ $(git -C "$ROOT" branch --show-current) == main ]] || fail 'Parent must be on main'
+git -C "$ROOT" diff --cached --quiet || fail 'Parent index must be empty'
+[[ $(git -C "$ROOT" ls-files --stage -- "plugins/$PLUGIN") == 160000\ * ]] || fail 'Plugin must be a tracked submodule'
+for repo in "$ROOT" "$SUB"; do
+  for state in MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD rebase-merge rebase-apply; do
+    state_path=$(git -C "$repo" rev-parse --git-path "$state")
+    [[ "$state_path" == /* ]] || state_path="$repo/$state_path"
+    [[ ! -e "$state_path" ]] || fail "Pending Git operation in $repo"
+  done
+done
+current=$(git -C "$SUB" branch --show-current)
+[[ "$current" == main || "$current" == "$BRANCH" ]] || fail 'Plugin must be on main or the source branch'
+git -C "$SUB" show-ref --verify --quiet refs/heads/main || fail 'Missing main branch'
+git -C "$SUB" show-ref --verify --quiet "refs/heads/$BRANCH" || fail 'Missing source branch'
+SOURCE_SHA=$(git -C "$SUB" rev-parse "refs/heads/$BRANCH")
 
 [ -d "$SUB/.git" ] || [ -f "$SUB/.git" ] || { echo "ERROR: $SUB 는 서브모듈이 아님"; exit 1; }
 
@@ -24,13 +45,26 @@ DIRTY=$(git status --porcelain | wc -l | tr -d ' ')
 [ "$DIRTY" = "0" ] || { echo "ERROR: 서브모듈에 미커밋 $DIRTY개 — 먼저 커밋하거나 stash"; git status --short | head -5; exit 1; }
 
 echo "▶ 2/6 버전 확인"
-VER=$(python3 -c "import json;print(json.load(open('.claude-plugin/plugin.json'))['version'])" 2>/dev/null || echo "?")
+# Validate the actual merge tree before changing branches, index, or commits.
+MERGED_TREE=$(git merge-tree --write-tree refs/heads/main "$SOURCE_SHA") || fail 'Merge conflicts; resolve separately'
+VER=$(git show "$MERGED_TREE:.claude-plugin/plugin.json" | python3 -c '
+import json, re, sys
+version = json.load(sys.stdin)["version"]
+pattern = r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?"
+if not isinstance(version, str) or not re.fullmatch(pattern, version):
+    sys.exit("Invalid release version")
+if "-" in version:
+    prerelease = version.split("+", 1)[0].split("-", 1)[1]
+    if any(part.isdigit() and len(part) > 1 and part.startswith("0") for part in prerelease.split(".")):
+        sys.exit("Invalid numeric prerelease identifier")
+print(version)
+') || fail 'Invalid merged plugin manifest'
 echo "   plugin.json version = $VER"
 grep -q "^## $VER" CHANGELOG.md 2>/dev/null || echo "   ⚠ CHANGELOG.md에 '## $VER' 항목이 없음 — 확인 권장"
 
 echo "▶ 3/6 서브모듈 머지 ($BRANCH → main)"
 git checkout main -q
-git merge --no-ff "$BRANCH" -m "merge $BRANCH (v$VER)" -q
+git merge --no-ff "$SOURCE_SHA" -m "merge $BRANCH (v$VER)" -q
 echo "   머지 완료: $(git log --oneline -1)"
 
 echo "▶ 4/6 서브모듈 푸시"
@@ -46,7 +80,7 @@ git add "plugins/$PLUGIN"
 if git diff --cached --quiet; then
   echo "   포인터 변화 없음 (이미 최신)"
 else
-  git commit -q -m "chore: update $PLUGIN submodule to v$VER"
+  git commit -q --only -m "chore: update $PLUGIN submodule to v$VER" -- "plugins/$PLUGIN"
   echo "   $(git log --oneline -1)"
 fi
 

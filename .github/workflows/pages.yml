@@ -20,6 +20,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: github.repository == 'fivetaku/gptaku_plugins' || vars.ENABLE_FORK_PAGES == 'true'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

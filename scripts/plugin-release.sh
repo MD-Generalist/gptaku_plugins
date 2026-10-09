@@ -24,7 +24,7 @@ SUB="$ROOT/plugins/$PLUGIN"
 git -C "$ROOT" diff --cached --quiet || fail 'Parent index must be empty'
 [[ $(git -C "$ROOT" ls-files --stage -- "plugins/$PLUGIN") == 160000\ * ]] || fail 'Plugin must be a tracked submodule'
 for repo in "$ROOT" "$SUB"; do
-  for state in MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD rebase-merge rebase-apply; do
+  for state in MERGE_HEAD CHERRY_PICK_HEAD REVERT_HEAD rebase-merge rebase-apply sequencer; do
     state_path=$(git -C "$repo" rev-parse --git-path "$state")
     [[ "$state_path" == /* ]] || state_path="$repo/$state_path"
     [[ ! -e "$state_path" ]] || fail "Pending Git operation in $repo"
